@@ -14,7 +14,7 @@ Copy the binary to the program you want to log:
 Make a config file under the same directory as `my-app` with the
 extension `.args`: my-app.args
 
-Put in the file
+Put in the file (args are line separated)
 
     --bin
     /path/to/real/my-app
