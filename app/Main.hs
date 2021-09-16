@@ -4,6 +4,7 @@ module Main where
 import           Control.Concurrent.Async
 import           Control.Monad.IO.Class
 import           Data.ByteString (ByteString)
+import qualified Data.ByteString as S
 import qualified Data.ByteString.Char8 as S8
 import           Data.Conduit
 import qualified Data.Conduit.Binary as CB
@@ -39,7 +40,11 @@ main = do
        withFile
          logpath
          WriteMode
-         (\handle ->
+         (\handle -> do
+            hSetBuffering handle NoBuffering
+            hSetBuffering (getStdin process) NoBuffering
+            hSetBuffering (getStdout process) NoBuffering
+            hSetBuffering (getStderr process) NoBuffering
             concurrently_
               (runConduitRes
                  (CB.sourceHandle stdin .| logLines handle "stdin" .|
@@ -56,13 +61,18 @@ main = do
   hFlush stdout
   hFlush stderr
 
-logLines :: MonadIO m => Handle -> ByteString -> ConduitM ByteString c m ()
+logLines ::
+     MonadIO m => Handle -> ByteString -> ConduitM ByteString ByteString m ()
 logLines handle label =
-  CB.lines .|
-  CL.mapM_
-    (\line -> liftIO (do
-        time <- getCurrentTime
-        S8.hPutStrLn handle (fromString (show time) <> " " <> label <> "> " <> line)))
+  CL.mapM
+    (\blob ->
+       liftIO
+         (do time <- getCurrentTime
+             S8.hPutStrLn
+               handle
+               (fromString (show time) <> " " <> label <>
+                S.concat (map ("> " <>) (S8.lines blob)))
+             pure blob))
 
 options :: ParserInfo Config
 options =
