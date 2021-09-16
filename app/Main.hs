@@ -1,6 +1,7 @@
 {-# LANGUAGE RecordWildCards, OverloadedStrings #-}
 module Main where
 
+import           Control.Concurrent
 import           Control.Concurrent.Async
 import           Control.Monad.IO.Class
 import           Data.ByteString (ByteString)
@@ -16,6 +17,7 @@ import           System.Environment
 import           System.FilePath
 import           System.IO
 import           System.Process.Typed
+import           System.Posix.Signals
 
 data Config = Config
   { bin :: FilePath -- ^ Program to run
@@ -24,6 +26,9 @@ data Config = Config
 
 main :: IO ()
 main = do
+  mainId <- myThreadId
+  _ <-
+    installHandler softwareTermination (CatchOnce (killThread mainId)) Nothing
   hSetBuffering stdout NoBuffering
   hSetBuffering stderr NoBuffering
   hSetBuffering stdin NoBuffering

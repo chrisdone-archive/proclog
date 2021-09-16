@@ -29,6 +29,7 @@ dependencies:
 - async
 - time
 - bytestring
+- unix
 
 executables:
   proclog:
