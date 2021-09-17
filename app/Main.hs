@@ -76,7 +76,7 @@ logLines handle label =
              S8.hPutStrLn
                handle
                (fromString (show time) <> " " <> label <>
-                S.concat (map ("> " <>) (S8.lines blob)))
+                S8.unlines (map ("> " <>) (S8.lines blob)))
              pure blob))
 
 options :: ParserInfo Config
