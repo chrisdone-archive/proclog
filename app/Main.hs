@@ -73,7 +73,7 @@ logLines handle label =
     (\blob ->
        liftIO
          (do time <- getCurrentTime
-             S8.hPutStrLn
+             S8.hPutStr
                handle
                (fromString (show time) <> " " <> label <>
                 S8.unlines (map ("> " <>) (S8.lines blob)))
