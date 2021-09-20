@@ -46,6 +46,7 @@ main = do
          logpath
          WriteMode
          (\handle -> do
+            hPutStrLn handle ("Arguments: " ++ show guestArgs)
             hSetBuffering handle NoBuffering
             hSetBuffering (getStdin process) NoBuffering
             hSetBuffering (getStdout process) NoBuffering
